@@ -14,5 +14,13 @@ RUN curl -sSL https://install.python-poetry.org | python3 - --version ${POETRY_V
 # Set the PATH to include Poetry
 ENV PATH="/root/.local/bin:$PATH"
 
+# Set the working directory in the container
+WORKDIR /app
+
+# Copy the Python requirements files into the container at /app
+COPY ../pyproject.toml ../poetry.lock* /app/
+
+RUN poetry shell
+
 CMD ["/bin/sh", "-c", "bash"]
 #docker-compose exec my_python sh 
