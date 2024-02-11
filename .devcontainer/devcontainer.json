@@ -1,0 +1,8 @@
+{
+    "name": "crypto_zillqa_etl",
+    // "image": "python:3.10",
+    "build": {
+        "dockerfile": "Dockerfile"
+    } 
+
+}
