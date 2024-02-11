@@ -6,6 +6,7 @@ authors = ["codefox <isuranimalasiri@gmail.com>"]
 
 [tool.poetry.dependencies]
 python = "^3.10"
+google-cloud-bigquery = "^3.17.2"
 
 [tool.poetry.dev-dependencies]
 
