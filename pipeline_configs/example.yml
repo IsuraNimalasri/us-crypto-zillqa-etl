@@ -1,0 +1,36 @@
+# This is the configuration file for the example pipeline. 
+# You can change the values according to your needs.
+
+pipeline:
+  name: example  # Name of the pipeline. Change 'example' to your pipeline's name.
+
+  bigquery:
+    project: bigquery-public-data  # Google Cloud project ID where the BigQuery dataset resides.
+    dataset: crypto_zilliqa  # Name of the BigQuery dataset to be used.
+
+  # Path to the SQL file containing data transformation logic and the metric dataset name. 
+  query_metric:
+    - name: monthly_active_addresses
+      query_path: ./src/sqls/monthly_active_addresses.sql 
+
+    - name: daily_volume_crypto
+      query_path: ./src/sqls/daily_volume_crypto.sql 
+    
+    - name: daily_energy_consumption
+      query_path: ./src/sqls/daily_energy_consumption.sql 
+   
+
+  s3:
+    region: us-east-1  # AWS region where the S3 bucket is located.
+    bucket_name: example_bucket  # Name of the S3 bucket where the data will be stored.
+    prefix_pattern: "{}/processed_date={}/"  # Prefix pattern for storing files in S3. Change 'example' to match the pipeline name if it changes.
+    file_format: parquet  # Format of the file to be stored in S3. Options: parquet, csv, etc.
+  
+  governance:
+    source_pii: false
+    destination_pii: false
+
+  meta:
+    frequency: daily # Frequency of the pipeline execution. Options: daily, weekly, monthly, etc.
+    max_results: 10000
+    page_token: null
