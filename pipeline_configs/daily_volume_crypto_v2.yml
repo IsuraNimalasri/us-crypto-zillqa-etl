@@ -1,0 +1,29 @@
+# This is the configuration file for the daily_volume_crypto pipeline. 
+
+pipeline:
+  name: daily_volume_crypto_v2  
+
+  bigquery:
+    project: bigquery-public-data  
+    dataset: crypto_zilliqa  
+
+  # Path to the SQL file containing data transformation logic and the metric dataset name. 
+  query_metric:
+    - name: daily_volume_crypto_v2
+      query_path: ./src/sqls/daily_volume_crypto.sql 
+   
+
+  s3:
+    region: us-east-1  
+    bucket_name: zillqa-dataset-bucket 
+    prefix_pattern: "{}/processed_date={}/"  
+    file_format: parquet  
+  
+  governance:
+    source_pii: false
+    destination_pii: false
+
+  meta:
+    frequency: daily # Frequency of the pipeline execution. Options: daily, weekly, monthly, etc.
+    max_results: 10000
+    page_token: null

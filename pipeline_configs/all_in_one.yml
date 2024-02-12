@@ -1,8 +1,8 @@
-# This is the configuration file for the example pipeline. 
+# This is the configuration file for the all_in_one pipeline. 
 # You can change the values according to your needs.
 
 pipeline:
-  name: example  # Name of the pipeline. Change 'example' to your pipeline's name.
+  name: all_in_one  # Name of the pipeline. Change 'all_in_one' to your pipeline's name.
 
   bigquery:
     project: bigquery-public-data  # Google Cloud project ID where the BigQuery dataset resides.
@@ -12,7 +12,7 @@ pipeline:
   query_metric:
     - name: monthly_active_addresses
       query_path: ./src/sqls/monthly_active_addresses.sql 
-
+      
     - name: daily_volume_crypto
       query_path: ./src/sqls/daily_volume_crypto.sql 
     
@@ -23,7 +23,7 @@ pipeline:
   s3:
     region: us-east-1  # AWS region where the S3 bucket is located.
     bucket_name: example_bucket  # Name of the S3 bucket where the data will be stored.
-    prefix_pattern: "{}/processed_date={}/"  # Prefix pattern for storing files in S3. Change 'example' to match the pipeline name if it changes.
+    prefix_pattern: "{}/processed_date={}/"  # Prefix pattern for storing files in S3. Change 'all_in_one' to match the pipeline name if it changes.
     file_format: parquet  # Format of the file to be stored in S3. Options: parquet, csv, etc.
   
   governance:
