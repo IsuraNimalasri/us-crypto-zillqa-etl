@@ -24,3 +24,6 @@ aws --endpoint-url=$LOCALSTACK_ENDPOINT_URL s3 ls
 export AWS_PROFILE=localstack
 export AWS_REGION=us-east-1
 export LOCALSTACK_ENDPOINT_URL=http://localhost:4566
+
+
+# https://hands-on.cloud/testing-python-aws-applications-using-localstack/
