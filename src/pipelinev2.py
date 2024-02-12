@@ -11,8 +11,8 @@ from typing import Tuple, List, Any, Dict
 import boto3
 
 
-AWS_REGION = 'us-east-1'
-AWS_PROFILE = 'localstack'
+AWS_REGION = os.environ.get('AWS_REGION')
+AWS_PROFILE = os.environ.get('AWS_PROFILE')
 ENDPOINT_URL = os.environ.get('LOCALSTACK_ENDPOINT_URL')
 
 
@@ -48,8 +48,8 @@ class Pipeline:
 
             rows, table_schema = self.extract_transformation_data(tquery=_query)
 
-            # self.load_to_local(table_rows=rows, local_path=s3_prefix_pattern, schema=table_schema, filename=file_name)
-            self.load_to_s3(table_rows=rows, s3_path=s3_prefix_pattern, schema=table_schema, filename=file_name)
+            _abs_path = self.load_to_local(table_rows=rows, local_path=s3_prefix_pattern, schema=table_schema, filename=file_name)
+            self.load_to_s3(abs_path = _abs_path , s3_obj_path =s3_prefix_pattern )
 
     def extract_transformation_data(self, tquery: str) -> Tuple[List[Any], List]:
         """Executes the transformation query and extracts data along with schema."""
@@ -88,39 +88,27 @@ class Pipeline:
         abs_path = os.path.abspath(f"{parquet_file_path}/{filename}")
         pq.write_table(table, abs_path)
         logging.info(f'Data written to {abs_path}.')
+        return abs_path
 
 
-    def load_to_s3(self, table_rows: List[Any], s3_path: str, schema: List, filename: str):
+    def load_to_s3(self,  abs_path: str, s3_obj_path: str):
         
-        """Loads the transformed data into S3 (LocalStack) as a Parquet file."""
-        columns = [field.name for field in schema]
-        df = pd.DataFrame(data=table_rows, columns=columns)
-        
-        table = pa.Table.from_pandas(df)
-        parquet_file_path = f"{s3_path}/{filename}"
+        """Loads the transformed data into S3  as a Parquet file."""
 
-        # Convert the PyArrow Table to a Parquet file in memory
-        buffer = pa.BufferOutputStream()
-        pq.write_table(table, buffer)
-        parquet_bytes = buffer.getvalue()
-        
         boto3.setup_default_session(profile_name=AWS_PROFILE)
-        # Configure boto3 to use the LocalStack endpoint
-        s3_client = boto3.client("s3", region_name=AWS_REGION,
+        s3_client = boto3.client("s3", region_name=AWS_REGION,      
                          endpoint_url=ENDPOINT_URL)
 
-        # Assuming s3_path is in the format "bucket_name/path/to/file"
-        bucket_name = self.cfg_data['pipeline']['s3']['bucket_name']
-        object_name = parquet_file_path
-
+            # Upload the local file to S3
+        bucket_name = 'zillqa-dataset-bucket'
         try:
-            # Upload the Parquet file to S3 (LocalStack)
-            s3_client.put_object(Bucket=bucket_name, Key=object_name, Body=parquet_bytes)
-            logging.info(f'Data successfully uploaded to {parquet_file_path} in LocalStack.')
-        except NoCredentialsError:
-            logging.error('AWS credentials not found.')
+            s3_client.upload_file(Filename=abs_path, Bucket=bucket_name, Key=s3_obj_path)
+            logging.info(f"Data successfully uploaded to S3: s3://{bucket_name}/{s3_obj_path}")
         except Exception as e:
-            logging.error(f'Failed to upload data to LocalStack S3: {e}')
+            logging.error(f"Failed to upload data to S3: {e}")
+
+        # Optionally, remove the local temporary file after upload
+        os.remove(abs_path)
 
 def setup_logging():
     """Sets up logging to write logs to a specific file based on the current date and time."""

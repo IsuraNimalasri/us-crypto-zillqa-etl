@@ -9,7 +9,7 @@ up_localstack:
 
  awslocal s3api list-buckets
 
- export LOCALSTACK_ENDPOINT_URL="http://localhost:4566"
+ 
 
 aws configure --profile localstack
 # AWS Access Key ID [None]: test
@@ -21,4 +21,6 @@ aws configure --profile localstack
 list buckets
 aws --endpoint-url=$LOCALSTACK_ENDPOINT_URL s3 ls
 
-
+export AWS_PROFILE=localstack
+export AWS_REGION=us-east-1
+export LOCALSTACK_ENDPOINT_URL=http://localhost:4566
